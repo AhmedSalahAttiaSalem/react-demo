@@ -1,31 +1,9 @@
-# Stage 1: Build
-#########################################
-FROM node:18-alpine AS builder
+FROM eclipse-temurin:17
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY target/*.jar app.jar
 
-RUN npm ci
+EXPOSE 8080
 
-COPY . .
-
-RUN npm run build
-
-
-#########################################
-# Stage 2: Runtime (serve static)
-#########################################
-FROM node:18-alpine
-
-WORKDIR /app
-
-# Install 'serve' globally to serve static files
-RUN npm install -g serve
-
-# Copy only build output
-COPY --from=builder /app/dist ./dist
-
-EXPOSE 3000
-
-CMD ["serve", "-s", "dist", "-l", "3000"]
+ENTRYPOINT ["java","-jar","app.jar"]
